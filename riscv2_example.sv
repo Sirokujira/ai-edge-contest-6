@@ -193,15 +193,15 @@ assign ap_ready = ap_done;
 
   // AXI4LITE signals
   //AXI4 internal temp signals
-  //reg [C_M00_AXI_ADDR_WIDTH-1 : 0]  axi_awaddr;
-  //reg     axi_awvalid;
-  //reg [C_M00_AXI_DATA_WIDTH-1 : 0]  axi_wdata;
-  //reg     axi_wlast;
-  //reg     axi_wvalid;
-  //reg     axi_bready;
-  reg [C_M00_AXI_ADDR_WIDTH-1 : 0]  axi_araddr;
-  reg     axi_arvalid;
-  reg     axi_rready;
+  reg [C_M00_AXI_ADDR_WIDTH-1 : 0]  M_00_AXI_AWADDR;
+  reg     M_00_AXI_AWVALID;
+  reg [C_M00_AXI_DATA_WIDTH-1 : 0]  M_00_AXI_WDATA;
+  reg     M_00_AXI_WLAST;
+  reg     M_00_AXI_WVALID;
+  reg     M_00_AXI_BREADY;
+  reg [C_M00_AXI_ADDR_WIDTH-1 : 0]  M_00_AXI_ARADDR;
+  reg     M_00_AXI_ARVALID;
+  reg     M_00_AXI_RREADY;
   //write beat count in a burst
   reg [C_TRANSACTIONS_NUM : 0]    write_index;
   //read beat count in a burst
@@ -236,7 +236,6 @@ assign ap_ready = ap_done;
 
   // I/O Connections assignments
   logic M_00_AXI_AWID;
-  logic M_00_AXI_AWADDR;
   logic M_00_AXI_AWLEN;
   logic M_00_AXI_AWSIZE;
   logic M_00_AXI_AWBURST;
@@ -247,12 +246,6 @@ assign ap_ready = ap_done;
   logic M_00_AXI_AWUSER;
   logic M_00_AXI_WSTRB;
   logic M_00_AXI_WUSER;
-  
-  logic M_00_AXI_AWVALID;
-  logic M_00_AXI_AWADDR;
-  logic M_00_AXI_WVALID;
-  logic M_00_AXI_WLAST;
-
   logic M_AXI_ARID;
   logic M_AXI_ARADDR;
   logic M_AXI_ARLEN;
@@ -268,9 +261,9 @@ assign ap_ready = ap_done;
   //I/O Connections. Write Address (AW)
   assign M_00_AXI_AWID   = 'b0;
   //The AXI address is a concatenation of the target base address + active offset range
-  assign M_00_AXI_AWADDR = C_M00_TARGET_SLAVE_BASE_ADDR + m00_axi_awaddr;
+  assign m00_axi_awaddr = C_M00_TARGET_SLAVE_BASE_ADDR + axi_awaddr;
   //Burst LENgth is number of transaction beats, minus 1
-  assign M_00_AXI_AWLEN  = C_M00_AXI_BURST_LEN - 1;
+  assign m00_axi_awlen  = C_M00_AXI_BURST_LEN - 1;
   //Size should be C_M00_AXI_DATA_WIDTH, in 2^SIZE bytes, otherwise narrow bursts are used
   assign M_00_AXI_AWSIZE = clogb2((C_M00_AXI_DATA_WIDTH/8)-1);
   //INCR burst type is usually used, except for keyhole bursts
@@ -287,37 +280,62 @@ assign ap_ready = ap_done;
   assign M_00_AXI_WSTRB  = {(C_M00_AXI_DATA_WIDTH/8){1'b1}};
   assign M_00_AXI_WUSER  = 'b0;
   
-  logic M_AXI_ARID;
-  logic M_AXI_ARADDR;
-  logic M_AXI_ARLEN;
-  logic M_AXI_ARSIZE;
-  logic M_AXI_ARBURST;
-  logic M_AXI_ARLOCK;
-  logic M_AXI_AWCACHE;
-  logic M_AXI_AWPROT;
-  logic M_AXI_AWQOS;
-  logic M_AXI_AWUSER;
-  logic M_AXI_WSTRB;
-  logic M_AXI_WUSER;
+  assign m00_axi_awvalid = M_00_AXI_AWVALID;
+  assign m00_axi_wvalid = M_00_AXI_WVALID;
+  assign m00_axi_wdata = M_00_AXI_WDATA;
+  assign m00_axi_wlast = M_00_AXI_WLAST;
+  assign m00_axi_bready  = M_00_AXI_BREADY;
+  assign m00_axi_arvalid = M_00_AXI_ARVALID;
+
+  logic M_00_AXI_ARID;
+  logic M_00_AXI_ARADDR;
+  logic M_00_AXI_ARLEN;
+  logic M_00_AXI_ARSIZE;
+  logic M_00_AXI_ARBURST;
+  logic M_00_AXI_ARLOCK;
+  logic M_00_AXI_AWCACHE;
+  logic M_00_AXI_AWPROT;
+  logic M_00_AXI_AWQOS;
+  logic M_00_AXI_AWUSER;
+  logic M_00_AXI_WSTRB;
+  logic M_00_AXI_WUSER;
   logic INIT_AXI_TXN;
   logic burst_size_bytes;
-  
+  logic M_01_AXI_ARID;
+  logic M_01_AXI_ARADDR;
+  logic M_01_AXI_ARLEN;
+  logic M_01_AXI_ARSIZE;
+  logic M_01_AXI_ARBURST;
+  logic M_01_AXI_ARLOCK;
+
+  assign m00_axi_wstrb = M_00_AXI_WSTRB; 
+
   //Read Address (AR)
-  assign M_AXI_ARID   = 'b0;
-  assign M_AXI_ARADDR = C_M00_TARGET_SLAVE_BASE_ADDR + axi_araddr;
+  assign M_00_AXI_ARID   = 'b0;
+  assign M_01_AXI_ARID   = 'b0;
+  assign m00_axi_araddr = C_M00_TARGET_SLAVE_BASE_ADDR + axi_araddr;
+  assign m01_axi_araddr = C_M01_TARGET_SLAVE_BASE_ADDR + axi_araddr;
   //Burst LENgth is number of transaction beats, minus 1
-  assign M_AXI_ARLEN  = C_M00_AXI_BURST_LEN - 1;
+  assign M_00_AXI_ARLEN  = C_M00_AXI_BURST_LEN - 1;
+  assign M_01_AXI_ARLEN  = C_M01_AXI_BURST_LEN - 1;
   //Size should be C_M00_AXI_DATA_WIDTH, in 2^n bytes, otherwise narrow bursts are used
-  assign M_AXI_ARSIZE = clogb2((C_M00_AXI_DATA_WIDTH/8)-1);
+  assign M_00_AXI_ARSIZE = clogb2((C_M00_AXI_DATA_WIDTH/8)-1);
+  assign M_01_AXI_ARSIZE = clogb2((C_M01_AXI_DATA_WIDTH/8)-1);
   //INCR burst type is usually used, except for keyhole bursts
-  assign M_AXI_ARBURST    = 2'b01;
-  assign M_AXI_ARLOCK = 1'b0;
+  assign M_00_AXI_ARBURST    = 2'b01;
+  assign M_01_AXI_ARBURST    = 2'b01;
+  assign M_00_AXI_ARLOCK = 1'b0;
+  assign M_01_AXI_ARLOCK = 1'b0;
   //Update value to 4'b0011 if coherent accesses to be used via the Zynq ACP port. Not Allocated, Modifiable, not Bufferable. Not Bufferable since this example is meant to test memory, not intermediate cache. 
-  assign M_AXI_ARCACHE    = 4'b0010;
-  assign M_AXI_ARPROT = 3'h0;
-  assign M_AXI_ARQOS  = 4'h0;
-  assign M_AXI_ARUSER = 'b1;
-  //assign M_AXI_ARVALID    = axi_arvalid;
+  assign M_00_AXI_ARCACHE    = 4'b0010;
+  assign M_01_AXI_ARCACHE    = 4'b0010;
+  assign M_00_AXI_ARPROT = 3'h0;
+  assign M_01_AXI_ARPROT = 3'h0;
+  assign M_00_AXI_ARQOS  = 4'h0;
+  assign M_01_AXI_ARQOS  = 4'h0;
+  assign M_00_AXI_ARUSER = 'b1;
+  assign M_01_AXI_ARUSER = 'b1;
+  //assign M_AXI_ARVALID    = M_00_AXI_ARVALID;
   //Read and Read Response (R)
   //assign M_AXI_RREADY = axi_rready;
   //Example design I/O
@@ -369,20 +387,20 @@ assign ap_ready = ap_done;
         M_00_AXI_AWVALID <= 1'b0;                                           
       end                                                              
       else
-        m00_axi_awvalid <= m00_axi_awvalid;                                      
+        M_00_AXI_AWVALID <= m00_axi_awvalid;                                      
       end                                                                
                                                                          
                                                                          
   // Next address after AWREADY indicates previous address acceptance    
     always @(posedge ap_clk) begin                                                                
       if (ap_rst_n == 0 || init_txn_pulse == 1'b1) begin                                                            
-          m00_axi_awaddr <= 'b0;                                             
+          axi_awaddr <= 'b0;                                             
       end                                                              
       else if (m00_axi_awready && m00_axi_awvalid) begin                                                            
-          m00_axi_awaddr <= m00_axi_awaddr + burst_size_bytes;                   
+          axi_awaddr <= axi_awaddr + burst_size_bytes;                   
       end                                                              
       else                                                               
-        m00_axi_awaddr <= m00_axi_awaddr;                                        
+        axi_awaddr <= axi_awaddr;                                        
       end                                                                
 
 
@@ -415,19 +433,19 @@ assign ap_ready = ap_done;
   // WVALID logic, similar to the axi_awvalid always block above                      
     always @(posedge ap_clk) begin                                                                             
       if (ap_rst_n == 0 || init_txn_pulse == 1'b1 ) begin                                                                         
-          m00_axi_wvalid <= 1'b0;                                                     
+          M_00_AXI_WVALID <= 1'b0;                                                     
       end                                                                           
       // If previously not valid, start next transaction                              
       else if (~m00_axi_wvalid && start_single_burst_write) begin                                                                         
-          m00_axi_wvalid <= 1'b1;                                                     
+          M_00_AXI_WVALID <= 1'b1;                                                     
       end                                                                           
       /* If WREADY and too many writes, throttle WVALID                               
       Once asserted, VALIDs cannot be deasserted, so WVALID                           
       must wait until burst is complete with WLAST */                                 
       else if (wnext && m00_axi_wlast)                                                
-        m00_axi_wvalid <= 1'b0;                                                       
+        M_00_AXI_WVALID <= 1'b0;                                                       
       else                                                                            
-        m00_axi_wvalid <= m00_axi_wvalid;                                             
+        M_00_AXI_WVALID <= m00_axi_wvalid;                                             
     end                                                                               
                                                                                       
                                                                                       
@@ -435,23 +453,23 @@ assign ap_ready = ap_done;
   // WVALID logic, similar to the axi_awvalid always block above                      
   always @(posedge ap_clk) begin                                                                             
       if (ap_rst_n == 0 || init_txn_pulse == 1'b1 ) begin
-          m00_axi_wlast <= 1'b0;                                                      
+          M_00_AXI_WLAST <= 1'b0;                                                      
       end                                                                           
-      // m00_axi_wlast is asserted when the write index                               
+      // M_00_AXI_WLAST is asserted when the write index                               
       // count reaches the penultimate count to synchronize                           
       // with the last write data when write_index is b1111                           
       // else if (&(write_index[C_TRANSACTIONS_NUM-1:1])&& ~write_index[0] && wnext)  
       else if (((write_index == C_M00_AXI_BURST_LEN-2 && C_M00_AXI_BURST_LEN >= 2) && wnext) || (C_M00_AXI_BURST_LEN == 1 )) begin                                                                         
-          m00_axi_wlast <= 1'b1;                                                          
+          M_00_AXI_WLAST <= 1'b1;                                                          
       end                                                                           
-      // Deassrt m00_axi_wlast when the last write data has been                          
+      // Deassrt M_00_AXI_WLAST when the last write data has been                          
       // accepted by the slave with a valid response                                  
       else if (wnext)                                                                 
-        m00_axi_wlast <= 1'b0;                                                            
-      else if (m00_axi_wlast && C_M00_AXI_BURST_LEN == 1)                                 
-        m00_axi_wlast <= 1'b0;                                                            
+        M_00_AXI_WLAST <= 1'b0;                                                            
+      else if (M_00_AXI_WLAST && C_M00_AXI_BURST_LEN == 1)                                 
+        M_00_AXI_WLAST <= 1'b0;                                                            
       else                                                                            
-        m00_axi_wlast <= m00_axi_wlast;                                                       
+        M_00_AXI_WLAST <= m00_axi_wlast;                                                       
     end                                                                               
 
     /* Burst length counter. Uses extra counter register bit to indicate terminal count to reduce decode logic */
@@ -471,13 +489,13 @@ assign ap_ready = ap_done;
    Data pattern is only a simple incrementing count from 0 for each burst  */         
     always @(posedge ap_clk) begin                                                                             
       if (ap_rst_n == 0 || init_txn_pulse == 1'b1)                                                         
-        m00_axi_wdata <= 'b1;                                                             
+        axi_wdata <= 'b1;                                                             
       //else if (wnext && m00_axi_wlast)                                                  
-      //  m00_axi_wdata <= 'b0;                                                           
+      //  axi_wdata <= 'b0;                                                           
       else if (wnext)                                                                 
-        m00_axi_wdata <= m00_axi_wdata + 1;                                                   
+        axi_wdata <= axi_wdata + 1;                                                   
       else                                                                            
-        m00_axi_wdata <= m00_axi_wdata;                                                       
+        axi_wdata <= axi_wdata;                                                       
     end                                                                             
 
 
@@ -502,27 +520,27 @@ assign ap_ready = ap_done;
   always @(posedge ap_clk) begin                                                                 
     if (ap_rst_n == 0 || init_txn_pulse == 1'b1 )                                            
       begin                                                             
-        m00_axi_bready <= 1'b0;                                             
+        M_00_AXI_BREADY <= 1'b0;                                             
       end                                                               
-    // accept/acknowledge bresp with m00_axi_bready by the master           
+    // accept/acknowledge bresp with M_00_AXI_BREADY by the master           
     // when M_AXI_BVALID is asserted by slave                           
-    else if (M_AXI_BVALID && ~m00_axi_bready)                               
+    else if (M_AXI_BVALID && ~M_00_AXI_BREADY)                               
       begin                                                             
-        m00_axi_bready <= 1'b1;                                             
+        M_00_AXI_BREADY <= 1'b1;                                             
       end                                                               
     // deassert after one clock cycle                                   
-    else if (m00_axi_bready)                                                
+    else if (M_00_AXI_BREADY)                                                
       begin                                                             
-        m00_axi_bready <= 1'b0;                                             
+        M_00_AXI_BREADY <= 1'b0;                                             
       end                                                               
     // retain the previous value                                        
     else                                                                
-      m00_axi_bready <= m00_axi_bready;                                         
+      M_00_AXI_BREADY <= M_00_AXI_BREADY;                                         
   end                                                                   
                                                                           
                                                                           
   //Flag any write response errors                                        
-  assign write_resp_error = m00_axi_bready & M_AXI_BVALID & M_AXI_BRESP[1]; 
+  assign write_resp_error = M_00_AXI_BREADY & M_AXI_BVALID & M_AXI_BRESP[1]; 
 
 
   //----------------------------
@@ -538,19 +556,19 @@ assign ap_ready = ap_done;
     always @(posedge ap_clk) begin                                                              
       if (ap_rst_n == 0 || init_txn_pulse == 1'b1 )                                         
         begin                                                          
-          axi_arvalid <= 1'b0;                                         
+          M_00_AXI_ARVALID <= 1'b0;                                         
         end                                                            
       // If previously not valid , start next transaction              
-      else if (~axi_arvalid && start_single_burst_read)                
+      else if (~M_00_AXI_ARVALID && start_single_burst_read)                
         begin                                                          
-          axi_arvalid <= 1'b1;                                         
+          M_00_AXI_ARVALID <= 1'b1;                                         
         end                                                            
-      else if (M_AXI_ARREADY && axi_arvalid)                           
+      else if (M_00_AXI_ARREADY && M_00_AXI_ARVALID)                           
         begin                                                          
-          axi_arvalid <= 1'b0;                                         
+          M_00_AXI_ARVALID <= 1'b0;                                         
         end                                                            
       else                                                             
-        axi_arvalid <= axi_arvalid;                                    
+        M_00_AXI_ARVALID <= M_00_AXI_ARVALID;                                    
     end                                                                
                                                                        
                                                                        
@@ -561,7 +579,7 @@ assign ap_ready = ap_done;
         begin                                                          
           axi_araddr <= 'b0;                                           
         end                                                            
-      else if (M_AXI_ARREADY && axi_arvalid)                           
+      else if (M_00_AXI_ARREADY && M_00_AXI_ARVALID)                           
         begin                                                          
           axi_araddr <= axi_araddr + burst_size_bytes;                 
         end                                                            
@@ -731,7 +749,7 @@ assign ap_ready = ap_done;
         begin                                                                                                 
           read_burst_counter <= 'b0;                                                                          
         end                                                                                                   
-      else if (M_AXI_ARREADY && axi_arvalid)                                                                  
+      else if (M_00_AXI_ARREADY && M_00_AXI_ARVALID)                                                                  
         begin                                                                                                 
           if (read_burst_counter[C_NO_BURSTS_REQ] == 1'b0)                                                    
             begin                                                                                             
@@ -854,7 +872,7 @@ assign ap_ready = ap_done;
       //The burst_write_active is asserted when a write burst transaction is initiated                        
       else if (start_single_burst_write)                                                                      
         burst_write_active <= 1'b1;                                                                           
-      else if (M_AXI_BVALID && m00_axi_bready)                                                                    
+      else if (M_AXI_BVALID && M_00_AXI_BREADY)                                                                    
         burst_write_active <= 0;                                                                              
     end                                                                                                       
                                                                                                               
@@ -870,8 +888,8 @@ assign ap_ready = ap_done;
         writes_done <= 1'b0;                                                                                  
                                                                                                               
       //The writes_done should be associated with a bready response                                           
-      //else if (M_AXI_BVALID && m00_axi_bready && (write_burst_counter == {(C_NO_BURSTS_REQ-1){1}}) && m00_axi_wlast)
-      else if (M_AXI_BVALID && (write_burst_counter[C_NO_BURSTS_REQ]) && m00_axi_bready)                          
+      //else if (M_AXI_BVALID && M_00_AXI_BREADY && (write_burst_counter == {(C_NO_BURSTS_REQ-1){1}}) && m00_axi_wlast)
+      else if (M_AXI_BVALID && (write_burst_counter[C_NO_BURSTS_REQ]) && M_00_AXI_BREADY)                          
         writes_done <= 1'b1;                                                                                  
       else                                                                                                    
         writes_done <= writes_done;                                                                           
@@ -905,7 +923,7 @@ assign ap_ready = ap_done;
         reads_done <= 1'b0;                                                                                   
                                                                                                               
       //The reads_done should be associated with a rready response                                            
-      //else if (M_AXI_BVALID && m00_axi_bready && (write_burst_counter == {(C_NO_BURSTS_REQ-1){1}}) && m00_axi_wlast)
+      //else if (M_AXI_BVALID && M_00_AXI_BREADY && (write_burst_counter == {(C_NO_BURSTS_REQ-1){1}}) && m00_axi_wlast)
       else if (M_AXI_RVALID && axi_rready && (read_index == C_M00_AXI_BURST_LEN-1) && (read_burst_counter[C_NO_BURSTS_REQ]))
         reads_done <= 1'b1;                                                                                   
       else                                                                                                    
@@ -922,24 +940,24 @@ VexRiscvSignate riscv(
   .iBusAxi_ar_valid(m01_axi_arvalid),
   .iBusAxi_ar_ready(m01_axi_arready),
   .iBusAxi_ar_payload_addr(m01_axi_araddr),
-  .iBusAxi_ar_payload_id(M_AXI_ARID),
+  .iBusAxi_ar_payload_id(M_01_AXI_ARID),
   .iBusAxi_ar_payload_region(4'b0001),
   .iBusAxi_ar_payload_len(m01_axi_arlen),
-  .iBusAxi_ar_payload_size(M_AXI_ARSIZE),
-  .iBusAxi_ar_payload_burst(M_AXI_ARBURST),
-  .iBusAxi_ar_payload_lock(M_AXI_ARLOCK),
-  .iBusAxi_ar_payload_cache(M_AXI_ARCACHE),
-  .iBusAxi_ar_payload_qos(M_AXI_ARQOS),
-  .iBusAxi_ar_payload_prot(M_AXI_ARPROT),
+  .iBusAxi_ar_payload_size(M_01_AXI_ARSIZE),
+  .iBusAxi_ar_payload_burst(M_01_AXI_ARBURST),
+  .iBusAxi_ar_payload_lock(M_01_AXI_ARLOCK),
+  .iBusAxi_ar_payload_cache(M_01_AXI_ARCACHE),
+  .iBusAxi_ar_payload_qos(M_01_AXI_ARQOS),
+  .iBusAxi_ar_payload_prot(M_01_AXI_ARPROT),
   .iBusAxi_r_valid(m01_axi_rvalid),
   .iBusAxi_r_ready(m01_axi_rready),
   .iBusAxi_r_payload_data(m01_axi_rdata),
-  .iBusAxi_r_payload_id(M_AXI_ARID),
+  .iBusAxi_r_payload_id(M_01_AXI_ARID),
   .iBusAxi_r_payload_resp(2'b00),
   .iBusAxi_r_payload_last(m01_axi_rlast),
-  .dBusAxi_aw_valid(m00_axi_awvalid),
+  .dBusAxi_aw_valid(M_00_AXI_AWVALID),
   .dBusAxi_aw_ready(m00_axi_awready),
-  .dBusAxi_aw_payload_addr(m00_axi_awaddr),
+  .dBusAxi_aw_payload_addr(M_00_AXI_AWADDR),
   .dBusAxi_aw_payload_id(M_00_AXI_AWID),
   .dBusAxi_aw_payload_region(4'b0001),
   .dBusAxi_aw_payload_len(m00_axi_awlen),
@@ -949,31 +967,31 @@ VexRiscvSignate riscv(
   .dBusAxi_aw_payload_cache(M_00_AXI_AWCACHE),
   .dBusAxi_aw_payload_qos(M_00_AXI_AWQOS),
   .dBusAxi_aw_payload_prot(M_00_AXI_AWPROT),
-  .dBusAxi_w_valid(m00_axi_wvalid),
+  .dBusAxi_w_valid(M_00_AXI_WVALID),
   .dBusAxi_w_ready(m00_axi_wready),
-  .dBusAxi_w_payload_data(m00_axi_wdata),
-  .dBusAxi_w_payload_strb(m00_axi_wstrb),
-  .dBusAxi_w_payload_last(m00_axi_wlast),
+  .dBusAxi_w_payload_data(axi_wdata),
+  .dBusAxi_w_payload_strb(M_00_AXI_WSTRB),
+  .dBusAxi_w_payload_last(M_00_AXI_WLAST),
   .dBusAxi_b_valid(m00_axi_bvalid),
-  .dBusAxi_b_ready(m00_axi_bready),
+  .dBusAxi_b_ready(M_00_AXI_BREADY),
   .dBusAxi_b_payload_id(M_00_AXI_AWID),
   .dBusAxi_b_payload_resp(2'b00),
-  .dBusAxi_ar_valid(m00_axi_arvalid),
-  .dBusAxi_ar_ready(m00_axi_arready),
+  .dBusAxi_ar_valid(M_00_AXI_ARVALID),
+  .dBusAxi_ar_ready(M_00_AXI_ARREADY),
   .dBusAxi_ar_payload_addr(m00_axi_araddr),
-  .dBusAxi_ar_payload_id(M_AXI_ARID),
+  .dBusAxi_ar_payload_id(M_00_AXI_ARID),
   .dBusAxi_ar_payload_region(4'b0001),
   .dBusAxi_ar_payload_len(m00_axi_arlen),
-  .dBusAxi_ar_payload_size(M_AXI_ARSIZE),
-  .dBusAxi_ar_payload_burst(M_AXI_ARBURST),
-  .dBusAxi_ar_payload_lock(M_AXI_ARLOCK),
-  .dBusAxi_ar_payload_cache(M_AXI_ARCACHE),
-  .dBusAxi_ar_payload_qos(M_AXI_ARQOS),
-  .dBusAxi_ar_payload_prot(M_AXI_ARPROT),
+  .dBusAxi_ar_payload_size(M_00_AXI_ARSIZE),
+  .dBusAxi_ar_payload_burst(M_00_AXI_ARBURST),
+  .dBusAxi_ar_payload_lock(M_00_AXI_ARLOCK),
+  .dBusAxi_ar_payload_cache(M_00_AXI_ARCACHE),
+  .dBusAxi_ar_payload_qos(M_00_AXI_ARQOS),
+  .dBusAxi_ar_payload_prot(M_00_AXI_ARPROT),
   .dBusAxi_r_valid(m00_axi_rvalid),
   .dBusAxi_r_ready(m00_axi_rready),
   .dBusAxi_r_payload_data(m00_axi_rdata),
-  .dBusAxi_r_payload_id(M_AXI_ARID),
+  .dBusAxi_r_payload_id(M_00_AXI_ARID),
   .dBusAxi_r_payload_resp(2'b00),
   .dBusAxi_r_payload_last(m00_axi_rlast),
   .clk(ap_clk),

@@ -42,12 +42,12 @@ startgroup
 set_property -dict [list CONFIG.EN_SAFETY_CKT {false}] [get_bd_cells axi_bram_ctrl_1_bram]
 endgroup
 assign_bd_address
-set_property offset 0x00000000A0000000 [get_bd_addr_segs {riscv_1/m01_axi/SEG_IMEM_CONTROL_Mem0}]
-set_property offset 0x00000000A0020000 [get_bd_addr_segs {riscv_1/m00_axi/SEG_DMEM_CONTROL_Mem0}]
+set_property offset 0x00000000C0000000 [get_bd_addr_segs {riscv_1/m01_axi/SEG_IMEM_CONTROL_Mem0}]
+set_property offset 0x00000000C0020000 [get_bd_addr_segs {riscv_1/m00_axi/SEG_DMEM_CONTROL_Mem0}]
 reset_run synth_1
 launch_runs impl_1 -to_step write_bitstream -jobs 8
 wait_on_run impl_1
-write_hw_platform -hw -include_bit -force -file ./system_wrapper.xsa
+write_hw_platform -hw -include_bit -force -file system_wrapper.xsa
 exit
 
 

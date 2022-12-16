@@ -30,20 +30,11 @@ platform generate
 
 platform config -updatehw ./vitis/kv260_pfm/hw/system_wrapper.xsa
 
-# Linux app5
+# Linux test_udmabuf
 domain active linux_domain
-#C only
-#app create -name app5 -domain linux_domain -template "Linux Empty Application"
-#C++
-# https://support.xilinx.com/s/question/0D52E000071A8FESA0/vitis-20202-app-create-fails-from-xsct-console?language=en_US
-#NG
-#app create -name app5 -domain linux_domain -template "Linux Empty Application (C++)" -lang c++
-#app create -name app5 -domain linux_domain -template "Linux Empty Application" -lang c++
-#OK?
-#app create -name app5 -domain linux_domain -template "Empty Application (C++)" -lang c++
-#OK
-app create -name app5 -domain linux_domain -lang c++
+app create -name test_udmabuf -domain linux_domain -lang c++
 
-importsources -name app5 -path ./test5
-app build app5
+importsources -name test_udmabuf -path ./test_udmabuf
+app build test_udmabuf
+
 
