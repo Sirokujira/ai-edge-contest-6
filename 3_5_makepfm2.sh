@@ -15,6 +15,8 @@ mkdir vitis
 #touch hogehoge
 #custom design?(add bram) - once
 #vivado -mode batch -source scripts/open_vivado2.tcl
+#custom design?(add dmem) - once
+vivado -mode batch -source scripts/open_vivado_dmem.tcl
 #custom design?(add interfece[xilinx.com:interface:aximm_rtl]) - once
 #vivado -mode batch -source scripts/open_vivado_dma.tcl
 
@@ -35,6 +37,5 @@ xsct ./scripts/dt2.tcl
 #sed -i 's/system.bit.bin/aiedge.bin/g' ./vitis/dt/vitis/dt/aiedge/psu_cortexa53_0/device_tree_domain/bsp/pl.dtsi
 sed -i 's/system_wrapper.bit.bin/aiedge.bin/g' ./vitis/dt/vitis/dt/aiedge/psu_cortexa53_0/device_tree_domain/bsp/pl.dtsi
 sed -i 's/compatible = \"xlnx,riscv-1.0\";/compatible = \"generic-uio\";/g' ./vitis/dt/vitis/dt/aiedge/psu_cortexa53_0/device_tree_domain/bsp/pl.dtsi
-#sed -i 's/compatible = \"xlnx,axi-intc-4.1\", \"xlnx,xps-intc-1.00.a\";/compatible = \"generic-uio\";/g' ./vitis/dt/vitis/dt/aiedge/psu_cortexa53_0/device_tree_domain/bsp/pl.dtsi
 dtc -@ -O dtb -o ./vitis/dt/pl.dtbo ./vitis/dt/vitis/dt/aiedge/psu_cortexa53_0/device_tree_domain/bsp/pl.dtsi
 

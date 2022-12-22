@@ -36,9 +36,9 @@ float uint_as_float(unsigned int i){
 }
 
 //命令メモリの開始アドレス
-#define VEXRISCV_RESET_VECTOR 0x00000000
-#define IMEM_BASE_ADDRESS (VEXRISCV_RESET_VECTOR)
-#define DMEM_BASE_ADDRESS (VEXRISCV_RESET_VECTOR + 0x00001000)
+//#define VEXRISCV_RESET_VECTOR 0x00000000
+#define IMEM_BASE_ADDRESS 0x60000000
+#define DMEM_BASE_ADDRESS 0x60020000
 
 #include "UioAccessor.h"
 #include "UdmabufAccessor.h"
@@ -74,7 +74,6 @@ int main() {
     //    exit(-1);
     //}
 
-    //XRiscv_Initialize(&HlsRiscv, "riscv_1");
     int retval = XRiscv_Initialize(&HlsRiscv, "riscv");
     if (retval != XST_SUCCESS)
     {
@@ -139,7 +138,6 @@ int main() {
     printf("DMEM_BASE : %p.\n\r", (void*)DMEM_BASE);
     printf("IMEM_BASE : %p.\n\r", (void*)IMEM_BASE);
 
-
     //reset to launch RISC-V core
     //pl_resetn_1();
     //REG(GPIO_DATA) = 0x01; // Reset off
@@ -155,28 +153,28 @@ int main() {
     //XRiscv_Set_dBus(&HlsRiscv, (u64)DMEM_BASE); // StartAddress?(絶対?)
 
     /* Memory access test */
-    //IMEM_BASE[0] = 0xA0002437; //  0: lui s0,0xA0002
-    IMEM_BASE[0] = 0x00001437; //  0: lui s0,0x00001
+    IMEM_BASE[0] = 0x60020437; //  0: lui s0,0x6002000
+    //IMEM_BASE[0] = 0x00001437; //  0: lui s0,0x00001000
     IMEM_BASE[1] = 0x00040413; //  4: mv  s0,s0
-    IMEM_BASE[2] = 0x00042603; //  8: lw  a2,0(s0) # 0x00001000
+    IMEM_BASE[2] = 0x00042603; //  8: lw  a2,0(s0) # 0x60020000
     IMEM_BASE[3] = 0x00442683; //  C: lw  a3,4(s0)
     IMEM_BASE[4] = 0x00d60733; // 10: add a4,a2,a3
-    IMEM_BASE[5] = 0x00e42423; // 14: sw  a4,0(s0) # 0x00001000
+    IMEM_BASE[5] = 0x00e42423; // 14: sw  a4,0(s0) # 0x60020000
     IMEM_BASE[6] = 0x0000006f; // 18: j   0x18
     //check
-    system("devmem 0x00000000");
-    system("devmem 0x00000004");
-    system("devmem 0x00000008");
-    system("devmem 0x0000000C");
-    system("devmem 0x00000010");
-    system("devmem 0x00000014");
-    system("devmem 0x00000018");
+    system("devmem 0x60000000");
+    system("devmem 0x60000004");
+    system("devmem 0x60000008");
+    system("devmem 0x6000000C");
+    system("devmem 0x60000010");
+    system("devmem 0x60000014");
+    system("devmem 0x60000018");
 
     DMEM_BASE[0] = 0x00000012; //  0: 0x12
     DMEM_BASE[1] = 0x00000034; //  4: 0x34
     //check
-    system("devmem 0x00001000");
-    system("devmem 0x00001004");
+    system("devmem 0x60020000");
+    system("devmem 0x60020004");
 
     //REG(GPIO_DATA) = 0x00; // Reset on
     system("echo 0 > /sys/class/gpio/gpio172/value");
