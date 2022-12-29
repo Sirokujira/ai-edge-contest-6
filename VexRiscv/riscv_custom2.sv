@@ -12,7 +12,7 @@ module riscv #(
   parameter C_M00_AXI_TARGET_SLAVE_BASE_ADDR   = 32'h40000000,
   parameter integer C_M00_AXI_BURST_LEN = 16,
   parameter integer C_M00_AXI_ID_WIDTH  = 1,
-  parameter integer C_M00_AXI_ADDR_WIDTH    = 64,
+  parameter integer C_M00_AXI_ADDR_WIDTH    = 32,
   parameter integer C_M00_AXI_DATA_WIDTH    = 32,
   parameter integer C_M00_AXI_AWUSER_WIDTH  = 1,
   parameter integer C_M00_AXI_ARUSER_WIDTH  = 1,
@@ -24,7 +24,7 @@ module riscv #(
   parameter C_M01_AXI_TARGET_SLAVE_BASE_ADDR   = 32'h40000000,
   parameter integer C_M01_AXI_BURST_LEN = 16,
   parameter integer C_M01_AXI_ID_WIDTH  = 1,
-  parameter integer C_M01_AXI_ADDR_WIDTH    = 64,
+  parameter integer C_M01_AXI_ADDR_WIDTH    = 32,
   parameter integer C_M01_AXI_DATA_WIDTH    = 32,
   parameter integer C_M01_AXI_AWUSER_WIDTH  = 1,
   parameter integer C_M01_AXI_ARUSER_WIDTH  = 1,
@@ -200,7 +200,7 @@ inst_control_s_axi (
 //assign M_AXI_ARBURST    = 2'b01;
 //assign M_AXI_ARLOCK = 1'b0;
 ////Update value to 4'b0011 if coherent accesses to be used via the Zynq ACP port. Not Allocated, Modifiable, not Bufferable. Not Bufferable since this example is meant to test memory, not intermediate cache. 
-//assign M_AXI_ARCACHE    = 4'b0010;
+//assign M_AXI_ARCACHE    = 4'b0011;
 //assign M_AXI_ARPROT = 3'h0;
 //assign M_AXI_ARQOS  = 4'h0;
 ////I/O Connections. Write Address (AW)
@@ -212,7 +212,7 @@ inst_control_s_axi (
 //assign M_00_AXI_AWBURST    = 2'b01;
 //assign M_00_AXI_AWLOCK = 1'b0;
 ////Update value to 4'b0011 if coherent accesses to be used via the Zynq ACP port. Not Allocated, Modifiable, not Bufferable. Not Bufferable since this example is meant to test memory, not intermediate cache. 
-//assign M_00_AXI_AWCACHE    = 4'b0010;
+//assign M_00_AXI_AWCACHE    = 4'b0011;
 //assign M_00_AXI_AWPROT = 3'h0;
 //assign M_00_AXI_AWQOS  = 4'h0;
 //assign M_00_AXI_AWUSER = 'b1;
@@ -240,37 +240,38 @@ assign M_AXI_ARSIZE = clogb2((C_M00_AXI_DATA_WIDTH/8)-1);
 
 
 VexRiscvSignate riscv(
+  .externalResetVector(iBus[31:0]),
   .timerInterrupt(1'b0),
   .externalInterrupt(1'b0),
   .softwareInterrupt(1'b0),
   .iBusAxi_ar_valid(m01_axi_arvalid),
   .iBusAxi_ar_ready(m01_axi_arready),
   .iBusAxi_ar_payload_addr(m01_axi_araddr),
-  .iBusAxi_ar_payload_id('b0),
-  .iBusAxi_ar_payload_region(4'b0001),
+  .iBusAxi_ar_payload_id(1'b0),
+  .iBusAxi_ar_payload_region(4'b0000),
   .iBusAxi_ar_payload_len(m01_axi_arlen),
   .iBusAxi_ar_payload_size(M_AXI_ARSIZE),
   .iBusAxi_ar_payload_burst(2'b01),
   .iBusAxi_ar_payload_lock(1'b0),
-  .iBusAxi_ar_payload_cache(4'b0010),
+  .iBusAxi_ar_payload_cache(4'b0011),
   .iBusAxi_ar_payload_qos(4'h0),
   .iBusAxi_ar_payload_prot(3'h0),
   .iBusAxi_r_valid(m01_axi_rvalid),
   .iBusAxi_r_ready(m01_axi_rready),
   .iBusAxi_r_payload_data(m01_axi_rdata),
-  .iBusAxi_r_payload_id('b0),
+  .iBusAxi_r_payload_id(1'b0),
   .iBusAxi_r_payload_resp(2'b00),
   .iBusAxi_r_payload_last(m01_axi_rlast),
   .dBusAxi_aw_valid(m00_axi_awvalid),
   .dBusAxi_aw_ready(m00_axi_awready),
   .dBusAxi_aw_payload_addr(m00_axi_awaddr),
-  .dBusAxi_aw_payload_id('b0),
-  .dBusAxi_aw_payload_region(4'b0001),
+  .dBusAxi_aw_payload_id(1'b0),
+  .dBusAxi_aw_payload_region(4'b0000),
   .dBusAxi_aw_payload_len(m00_axi_awlen),
   .dBusAxi_aw_payload_size(M_AXI_ARSIZE),
   .dBusAxi_aw_payload_burst(2'b01),
   .dBusAxi_aw_payload_lock(1'b0),
-  .dBusAxi_aw_payload_cache(4'b0010),
+  .dBusAxi_aw_payload_cache(4'b0011),
   .dBusAxi_aw_payload_qos(4'h0),
   .dBusAxi_aw_payload_prot(3'h0),
   .dBusAxi_w_valid(m00_axi_wvalid),
@@ -280,24 +281,24 @@ VexRiscvSignate riscv(
   .dBusAxi_w_payload_last(m00_axi_wlast),
   .dBusAxi_b_valid(m00_axi_bvalid),
   .dBusAxi_b_ready(m00_axi_bready),
-  .dBusAxi_b_payload_id('b0),
+  .dBusAxi_b_payload_id(1'b0),
   .dBusAxi_b_payload_resp(2'b00),
   .dBusAxi_ar_valid(m00_axi_arvalid),
   .dBusAxi_ar_ready(m00_axi_arready),
   .dBusAxi_ar_payload_addr(m00_axi_araddr),
-  .dBusAxi_ar_payload_id('b0),
-  .dBusAxi_ar_payload_region(4'b0001),
+  .dBusAxi_ar_payload_id(1'b0),
+  .dBusAxi_ar_payload_region(4'b0000),
   .dBusAxi_ar_payload_len(m00_axi_arlen),
   .dBusAxi_ar_payload_size(M_AXI_ARSIZE),
   .dBusAxi_ar_payload_burst(2'b01),
   .dBusAxi_ar_payload_lock(1'b0),
-  .dBusAxi_ar_payload_cache(4'b0010),
+  .dBusAxi_ar_payload_cache(4'b0011),
   .dBusAxi_ar_payload_qos(4'h0),
   .dBusAxi_ar_payload_prot(3'h0),
   .dBusAxi_r_valid(m00_axi_rvalid),
   .dBusAxi_r_ready(m00_axi_rready),
   .dBusAxi_r_payload_data(m00_axi_rdata),
-  .dBusAxi_r_payload_id('b0),
+  .dBusAxi_r_payload_id(1'b0),
   .dBusAxi_r_payload_resp(2'b00),
   .dBusAxi_r_payload_last(m00_axi_rlast),
   .clk(ap_clk),

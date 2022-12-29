@@ -16,9 +16,11 @@ mkdir vitis
 #custom design?(add bram) - once
 #vivado -mode batch -source scripts/open_vivado2.tcl
 #custom design?(add dmem) - once
-vivado -mode batch -source scripts/open_vivado_dmem.tcl
+#vivado -mode batch -source scripts/open_vivado_dmem.tcl
 #custom design?(add interfece[xilinx.com:interface:aximm_rtl]) - once
 #vivado -mode batch -source scripts/open_vivado_dma.tcl
+#custom design?(add bram) - once
+vivado -mode batch -source scripts/open_vivado3.tcl
 
 
 #generate aiedge.xclbin? -> same.
