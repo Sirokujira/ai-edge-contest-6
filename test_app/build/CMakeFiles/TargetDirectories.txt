@@ -1,3 +1,0 @@
-/home/ubuntu/ai-edge-contest-6/test_app/build/CMakeFiles/sample_pointpillars_graph_runner.dir
-/home/ubuntu/ai-edge-contest-6/test_app/build/CMakeFiles/edit_cache.dir
-/home/ubuntu/ai-edge-contest-6/test_app/build/CMakeFiles/rebuild_cache.dir

@@ -1,5 +1,6 @@
 #!/bin/bash
 
+rm -rf sd_aiedge
 mkdir sd_aiedge
 cp ./vitis/aiedge.xclbin sd_aiedge
 cp ./vitis/dt/pl.dtbo sd_aiedge
