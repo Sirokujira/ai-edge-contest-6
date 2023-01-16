@@ -22,13 +22,17 @@ vivado -mode batch -source ./scripts/rtl_riscv.tcl
 #vivado -mode batch -source ./scripts/riscv_ex3.tcl
 #cp -f ./VexRiscv/riscv_custom.sv ./vitis/riscv_ex/imports/riscv.v
 #cp -f ./VexRiscv/riscv_custom.sv ./VexRiscv/riscv.sv
-cp ./VexRiscv/riscv_custom2.sv ./vitis/riscv_ex/imports/riscv.v
-cp ./VexRiscv/riscv_custom2.sv ./VexRiscv/riscv.sv
+cp -f ./VexRiscv/riscv_custom2.sv ./vitis/riscv_ex/imports/riscv.v
+cp -f ./VexRiscv/riscv_custom2.sv ./VexRiscv/riscv.sv
 vivado -mode batch -source ./scripts/riscv_ex4.tcl
 #AXI4 Full?
-#cp ./VexRiscv/riscv_custom3.sv ./vitis/riscv_ex/imports/riscv.v
-#cp ./VexRiscv/riscv_custom3.sv ./VexRiscv/riscv.sv
+#cp -f ./VexRiscv/riscv_custom3.sv ./vitis/riscv_ex/imports/riscv.v
+#cp -f ./VexRiscv/riscv_custom3.sv ./VexRiscv/riscv.sv
 #vivado -mode batch -source ./scripts/riscv_ex4.tcl
+#AXI4 Full(reserVector external) + Cfu?
+#cp -f ./VexRiscv/riscv_custom4.sv ./vitis/riscv_ex/imports/riscv.v
+#cp -f ./VexRiscv/riscv_custom4.sv ./VexRiscv/riscv.sv
+#vivado -mode batch -source ./scripts/riscv_ex5.tcl
 
 
 mkdir vitis/aiedge
@@ -47,5 +51,5 @@ vivado -mode batch -source ./src/prj/Vitis/scripts_gui/gen_sfm_xo.tcl -tclargs .
 cd ../..
 
 #aiedge.xclbin
-v++ --target hw --link --config ./scripts/aiedge-link.cfg -o./vitis/aiedge.xclbin --temp_dir ./vitis/aiedge --vivado.synth.jobs 16 ./vitis/aiedge/DPUCZDX8G.xo ./vitis/aiedge/sfm_xrt_top.xo ./vitis/riscv_ex/exports/riscv.xo
+v++ --target hw --link --config ./scripts/aiedge-link.cfg -o./vitis/aiedge.xclbin --temp_dir ./vitis/aiedge --vivado.synth.jobs $(nproc --all) ./vitis/aiedge/DPUCZDX8G.xo ./vitis/aiedge/sfm_xrt_top.xo ./vitis/riscv_ex/exports/riscv.xo
 

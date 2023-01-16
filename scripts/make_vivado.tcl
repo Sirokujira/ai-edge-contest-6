@@ -1,3 +1,32 @@
+proc numberOfCPUs {} {
+    # Windows puts it in an environment variable
+    global tcl_platform env
+    if {$tcl_platform(platform) eq "windows"} {
+        return $env(NUMBER_OF_PROCESSORS)
+    }
+
+    # Check for sysctl (OSX, BSD)
+    set sysctl [auto_execok "sysctl"]
+    if {[llength $sysctl]} {
+        if {![catch {exec $sysctl -n "hw.ncpu"} cores]} {
+            return $cores
+        }
+    }
+
+    # Assume Linux, which has /proc/cpuinfo, but be careful
+    if {![catch {open "/proc/cpuinfo"} f]} {
+        set cores [regexp -all -line {^processor\s} [read $f]]
+        close $f
+        if {$cores > 0} {
+            return $cores
+        }
+    }
+
+    # No idea what the actual number of cores is; exhausted all our options
+    # Fall back to returning 1; there must be at least that because we're running on it!
+    return 1
+}
+
 #-----------------------------------------------------------
 # Vivado v2022.1 (64-bit)
 # SW Build 3526262 on Mon Apr 18 15:47:01 MDT 2022
@@ -74,7 +103,8 @@ set_property pfm_name {fpgainfo:kv260:kv260_custom:1.0} [get_files -all {system.
 validate_bd_design
 make_wrapper -files [get_files ./vivado/vivado.srcs/sources_1/bd/system/system.bd] -top
 add_files -norecurse ./vivado/vivado.gen/sources_1/bd/system/hdl/system_wrapper.v
-launch_runs impl_1 -to_step write_bitstream -jobs 8
+set cpucount [numberOfCPUs]
+launch_runs impl_1 -to_step write_bitstream -jobs $cpucount
 wait_on_run impl_1
 set_property pfm_name {fpgainfo:kv260:kv260_custom:1.0} [get_files -all {./vivado/vivado.srcs/sources_1/bd/system/system.bd}]
 set_property platform.extensible {true} [current_project]

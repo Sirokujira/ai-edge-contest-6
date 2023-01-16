@@ -37,8 +37,9 @@ float uint_as_float(unsigned int i){
 
 //命令メモリの開始アドレス
 //#define VEXRISCV_RESET_VECTOR 0x00000000
-#define IMEM_BASE_ADDRESS 0x60000000
-#define DMEM_BASE_ADDRESS 0x60020000
+#define IMEM_BASE_ADDRESS 0x40000000
+//#define DMEM_BASE_ADDRESS 0x60020000
+#define DMEM_BASE_ADDRESS 0x40001000
 
 #include "UioAccessor.h"
 #include "UdmabufAccessor.h"
@@ -153,31 +154,39 @@ int main() {
     //XRiscv_Set_dBus(&HlsRiscv, (u64)DMEM_BASE); // StartAddress?(絶対?)
 
     /* Memory access test */
-    IMEM_BASE[0] = 0x60020437; //  0: lui s0,0x6002000
-    //IMEM_BASE[0] = 0x00001437; //  0: lui s0,0x00001000
+    //IMEM_BASE[0] = 0x60020437; //  0: lui s0,0x60020000
+    IMEM_BASE[0] = 0x40001437; //  0: lui s0,0xC0001000
     IMEM_BASE[1] = 0x00040413; //  4: mv  s0,s0
     IMEM_BASE[2] = 0x00042603; //  8: lw  a2,0(s0) # 0x60020000
     IMEM_BASE[3] = 0x00442683; //  C: lw  a3,4(s0)
     IMEM_BASE[4] = 0x00d60733; // 10: add a4,a2,a3
     IMEM_BASE[5] = 0x00e42423; // 14: sw  a4,0(s0) # 0x60020000
     IMEM_BASE[6] = 0x0000006f; // 18: j   0x18
+    //float
+    IMEM_BASE[2] = 0x00042607; //  8: flw  fa2,0(s0) # 0xA0020000
+	IMEM_BASE[3] = 0x00442687; //  C: flw  fa3,4(s0)
+	IMEM_BASE[4] = 0x00c68753; // 10: fadd fa4,fa2,fa3
+	IMEM_BASE[5] = 0x00e42427; // 14: fsw  fa4,8(s0) # 0xA0020000
     //check
-    system("devmem 0x60000000");
-    system("devmem 0x60000004");
-    system("devmem 0x60000008");
-    system("devmem 0x6000000C");
-    system("devmem 0x60000010");
-    system("devmem 0x60000014");
-    system("devmem 0x60000018");
+    system("devmem 0x40000000");
+    system("devmem 0x40000004");
+    system("devmem 0x40000008");
+    system("devmem 0x4000000C");
+    system("devmem 0x40000010");
+    system("devmem 0x40000014");
+    system("devmem 0x40000018");
 
     DMEM_BASE[0] = 0x00000012; //  0: 0x12
     DMEM_BASE[1] = 0x00000034; //  4: 0x34
     //check
-    system("devmem 0x60020000");
-    system("devmem 0x60020004");
+    //system("devmem 0x60020000");
+    //system("devmem 0x60020004");
+    system("devmem 0x40001000");
+    system("devmem 0x40001004");
+    system("devmem 0x40001008");
 
     //REG(GPIO_DATA) = 0x00; // Reset on
-    system("echo 0 > /sys/class/gpio/gpio172/value");
+    //system("echo 0 > /sys/class/gpio/gpio172/value");
     sleep(1);
 
     // Start the device and read the results
@@ -199,7 +208,6 @@ int main() {
     u32 isReady = XRiscv_IsReady(&HlsRiscv);
 
     //単体
-    /*
     DMEM_BASE[0] = 0x00000012; //  0: 0x12
     DMEM_BASE[1] = 0x00000034; //  4: 0x34
     // Reset off
@@ -207,33 +215,37 @@ int main() {
 
     unsigned int c = 0;
     //REG(GPIO_DATA) = 0x04; // LED1
-    system("echo 8 > /sys/class/gpio/gpio7/value");
+    //system("echo 8 > /sys/class/gpio/gpio7/value");
+    XRiscv_Set_reset_riscv(&HlsRiscv, 1);
     sleep(1);
-    //XRiscv_Start(&HlsRiscv);
-    unsigned int c1 = DMEM_BASE[0];
-    unsigned int c2 = DMEM_BASE[1];
-    unsigned int c3 = DMEM_BASE[2];
-    printf("%x %x %x\n\r",c1, c2, c3);
-    c = DMEM_BASE[2];
-    if(c == 0x00000046) { // 0x12+0x34=0x46
-        printf("Pass\n\r");
-        //REG(GPIO_DATA) = 0x04; // LED1
-    }else{
-        printf("Fail\n\r");
-        //REG(GPIO_DATA) = 0x06; // LED1,0
-    }
-    sleep(1);
-    printf("Successfully ran Hello World application\n\r");
-    XRiscv_Release(&HlsRiscv);
-    */
-    
+    XRiscv_Set_reset_riscv(&HlsRiscv, 0);
 
-    /*
+    bool isSingle = false;
+    // Single
+    if (isSingle)
+    {
+        //XRiscv_Start(&HlsRiscv);
+        unsigned int c1 = DMEM_BASE[0];
+        unsigned int c2 = DMEM_BASE[1];
+        unsigned int c3 = DMEM_BASE[2];
+        printf("%d %d %d.\n\r",c1, c2, c3);
+        c = DMEM_BASE[2];
+        if(c == 0x00000046) { // 0x12+0x34=0x46
+            printf("Pass\n\r");
+            //REG(GPIO_DATA) = 0x04; // LED1
+        }else{
+            printf("Fail\n\r");
+            //REG(GPIO_DATA) = 0x06; // LED1,0
+        }
+        sleep(1);
+        printf("Successfully ran Hello World application\n\r");
+    }
+
     //FPU?
     //TEST start
     srand(100);
     int all_ok = 1;
-    for(int i = 0; i < 100; i++){
+    for(int i = 0; i < 10000; i++){
         float a = (rand()%100)/100.0f;
         float b = (rand()%100)/100.0f;
         //set input data
@@ -242,10 +254,9 @@ int main() {
         //reset to launch RISC-V core
         //pl_resetn_1();
         //REG(GPIO_DATA) = 0x01; // Reset off
-        system("echo 1 > /sys/class/gpio/gpio172/value");
+        XRiscv_Set_reset_riscv(&HlsRiscv, 1);
         sleep(1);
-        //REG(GPIO_DATA) = 0x00; // Reset on
-        system("echo 0 > /sys/class/gpio/gpio172/value");
+        XRiscv_Set_reset_riscv(&HlsRiscv, 0);
         sleep(1);
 
         //wait RISC-V execution completion by waiting some period or using polling
@@ -262,7 +273,6 @@ int main() {
         }
     }
     if (all_ok) printf("ALL PASSED\n");
-    */
 
     // 確保したメモリを解放する
     //free(IMEM_BASE);
