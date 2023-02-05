@@ -103,7 +103,8 @@ set_property pfm_name {fpgainfo:kv260:kv260_custom:1.0} [get_files -all {system.
 validate_bd_design
 make_wrapper -files [get_files ./vivado/vivado.srcs/sources_1/bd/system/system.bd] -top
 add_files -norecurse ./vivado/vivado.gen/sources_1/bd/system/hdl/system_wrapper.v
-launch_runs impl_1 -to_step write_bitstream -jobs 8
+set cpucount [numberOfCPUs]
+launch_runs impl_1 -to_step write_bitstream -jobs $cpucount
 wait_on_run impl_1
 set_property pfm_name {fpgainfo:kv260:kv260_custom:1.0} [get_files -all {./vivado/vivado.srcs/sources_1/bd/system/system.bd}]
 set_property platform.extensible {true} [current_project]
