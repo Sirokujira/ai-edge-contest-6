@@ -5,6 +5,7 @@
 `timescale 1ns/1ps
 
 module VexRiscvSignate (
+  input      [31:0]   externalResetVector,
   input               timerInterrupt,
   input               externalInterrupt,
   input               softwareInterrupt,
@@ -8057,7 +8058,7 @@ module VexRiscvSignate (
   assign dBusAxi_b_ready = dbus_axi_b_ready; // @[Stream.scala 304:16]
   always @(posedge clk or posedge reset) begin
     if(reset) begin
-      IBusCachedPlugin_fetchPc_pcReg <= 32'ha0000000; // @[Data.scala 400:33]
+      IBusCachedPlugin_fetchPc_pcReg <= externalResetVector; // @[Data.scala 400:33]
       IBusCachedPlugin_fetchPc_correctionReg <= 1'b0; // @[Data.scala 400:33]
       IBusCachedPlugin_fetchPc_booted <= 1'b0; // @[Data.scala 400:33]
       IBusCachedPlugin_fetchPc_inc <= 1'b0; // @[Data.scala 400:33]

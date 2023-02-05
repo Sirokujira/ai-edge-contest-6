@@ -1,3 +1,32 @@
+proc numberOfCPUs {} {
+    # Windows puts it in an environment variable
+    global tcl_platform env
+    if {$tcl_platform(platform) eq "windows"} {
+        return $env(NUMBER_OF_PROCESSORS)
+    }
+
+    # Check for sysctl (OSX, BSD)
+    set sysctl [auto_execok "sysctl"]
+    if {[llength $sysctl]} {
+        if {![catch {exec $sysctl -n "hw.ncpu"} cores]} {
+            return $cores
+        }
+    }
+
+    # Assume Linux, which has /proc/cpuinfo, but be careful
+    if {![catch {open "/proc/cpuinfo"} f]} {
+        set cores [regexp -all -line {^processor\s} [read $f]]
+        close $f
+        if {$cores > 0} {
+            return $cores
+        }
+    }
+
+    # No idea what the actual number of cores is; exhausted all our options
+    # Fall back to returning 1; there must be at least that because we're running on it!
+    return 1
+}
+
 open_project ./vitis/aiedge/link/vivado/vpl/prj/prj.xpr
 update_compile_order -fileset sources_1
 open_bd_design {./vitis/aiedge/link/vivado/vpl/prj/prj.srcs/sources_1/bd/system/system.bd}
@@ -95,7 +124,8 @@ connect_bd_net [get_bd_pins xlconstant_0/dout] [get_bd_pins MyRiscv_0/m00_axi_in
 
 reset_run synth_1
 reset_run system_MyRiscv_0_0_synth_1
-launch_runs impl_1 -to_step write_bitstream -jobs 8
+set cpucount [numberOfCPUs]
+launch_runs impl_1 -to_step write_bitstream -jobs $cpucount
 wait_on_run impl_1
 #update platform?
 set_property pfm_name {fpgainfo:kv260:kv260_custom:1.0} [get_files -all {./vitis/aiedge/link/vivado/vpl/prj/prj.srcs/sources_1/bd/system/system.bd}]
