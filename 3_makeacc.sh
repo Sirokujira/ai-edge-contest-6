@@ -11,15 +11,6 @@
 #vivado -mode batch -source ./scripts/rtl_riscv2.tcl
 #vivado -mode batch -source ./scripts/riscv_ex2.tcl
 vivado -mode batch -source ./scripts/rtl_riscv.tcl
-#org
-#cp -f ./VexRiscv/riscv_example.sv_org ./VexRiscv/riscv_example.sv
-#vivado -mode batch -source ./scripts/riscv_ex.tcl
-#vexriscv axi4 wrapper
-#cp -f ./VexRiscv/riscv2_example.sv ./VexRiscv/riscv_example.sv
-#vivado -mode batch -source ./scripts/riscv_ex2a.tcl
-#axil_interconnect_wrap_1x2.v
-#cp -f ./VexRiscv/axil_interconnect_wrap_1x2.sv ./VexRiscv/riscv_example.sv
-#vivado -mode batch -source ./scripts/riscv_ex3.tcl
 #cp -f ./VexRiscv/riscv_custom.sv ./vitis/riscv_ex/imports/riscv.v
 #cp -f ./VexRiscv/riscv_custom.sv ./VexRiscv/riscv.sv
 cp -f ./VexRiscv/riscv_custom2.sv ./vitis/riscv_ex/imports/riscv.v
@@ -29,10 +20,6 @@ vivado -mode batch -source ./scripts/riscv_ex4.tcl
 #cp -f ./VexRiscv/riscv_custom3.sv ./vitis/riscv_ex/imports/riscv.v
 #cp -f ./VexRiscv/riscv_custom3.sv ./VexRiscv/riscv.sv
 #vivado -mode batch -source ./scripts/riscv_ex4.tcl
-#AXI4 Full(reserVector external) + Cfu?
-#cp -f ./VexRiscv/riscv_custom4.sv ./vitis/riscv_ex/imports/riscv.v
-#cp -f ./VexRiscv/riscv_custom4.sv ./VexRiscv/riscv.sv
-#vivado -mode batch -source ./scripts/riscv_ex5.tcl
 
 
 mkdir vitis/aiedge
