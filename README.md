@@ -11,7 +11,7 @@ $ source 3_makeacc.sh
 $ source 3_5_makepfm2.sh
 を実行してください。
 
-vitis\aiedge\link\vivado\vpl\prj フォルダ内に 
+vitis/riscv_ex/imports/hls/prj/sol/impl/misc/drivers/riscv_v1_0/src フォルダ内に 
 riscv 操作用のコードが生成されるので
 アプリ側で使用する場合は、生成されたコードを元に対応してください。
 
